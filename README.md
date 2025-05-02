@@ -68,7 +68,7 @@ You can filter papers by specific subcategories within a main category:
 
 ```python
 harvester = ArxivOAIHarvester(
-    category="cs:AI",
+    category="cs",
     date_from="2024-01-01",
     date_until="2024-01-31",
     subcategories=["cs.ai", "cs.cl", "cs.lg"],  # Get papers in AI, CL, and ML
@@ -89,7 +89,7 @@ session.headers.update({
 })
 
 harvester = ArxivOAIHarvester(
-    category="physics:hep-th",
+    category="cs",
     date_from="2024-01-01",
     date_until="2024-01-31",
     session=session
@@ -102,7 +102,7 @@ Configure retry behavior and timeouts:
 
 ```python
 harvester = ArxivOAIHarvester(
-    category="math:AG",
+    category="cs",
     date_from="2024-01-01",
     date_until="2024-01-31",
     timeout=600,        # Total operation timeout (seconds)
@@ -132,12 +132,12 @@ print(f"Affiliations: {record['affiliation']}")
 
 ## Available Categories
 
-ArXiv categories must be specified in colon form. Some common categories include:
+ArXiv subcategories must be specified in period form. Some common categories include:
 
-- Computer Science: `cs:AI`, `cs:CL`, `cs:CV`, `cs:LG`, etc.
-- Physics: `physics:hep-th`, `physics:quant-ph`, etc.
-- Mathematics: `math:AG`, `math:AT`, etc.
-- Statistics: `stat:ML`, `stat:TH`, etc.
+- Computer Science: `cs.ai`, `cs.cl`, `cs.cv`, `cs.lg`, etc.
+- Physics: `physics.hep-th`, `physics.quant-ph`, etc.
+- Mathematics: `math.ag`, `math.at`, etc.
+- Statistics: `stat.ml`, `stat.th`, etc.
 
 For a complete list of categories, visit [ArXiv's taxonomy](https://arxiv.org/category_taxonomy).
 
