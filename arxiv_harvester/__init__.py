@@ -7,5 +7,5 @@ while respecting rate limits and handling errors gracefully.
 
 from arxiv_harvester.harvester import ArxivOAIHarvester, Record
 
-__version__ = "0.1.0"
+__version__ = "0.1.1"
 __all__ = ["ArxivOAIHarvester", "Record"]
