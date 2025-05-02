@@ -10,6 +10,9 @@ A rate-limit-compliant OAI-PMH harvester for ArXiv papers. This package provides
 - Clean Pydantic models for paper metadata
 - Optional pandas DataFrame support
 - Type hints and comprehensive documentation
+- Filtering by subcategories
+- Creation date-based filtering
+- Progress reporting with total record count estimation
 
 ## Installation
 
@@ -37,6 +40,7 @@ harvester = ArxivOAIHarvester(
     category="cs:AI",
     date_from="2024-01-01",
     date_until="2024-01-31",
+    subcategories=["cs.ai", "cs.cl"],  # Optional: filter by specific subcategories
     max_results=100,  # Optional: limit the number of results
     verbose=True      # Optional: print progress information
 )
@@ -51,11 +55,26 @@ df = harvester.to_dataframe()
 for record in records[:5]:  # First 5 papers
     print(f"Title: {record['title']}")
     print(f"Authors: {', '.join(record['authors'])}")
+    print(f"Categories: {record['categories']}")
     print(f"Abstract: {record['abstract'][:200]}...")
     print("-" * 80)
 ```
 
 ## Advanced Usage
+
+### Filtering by Subcategories
+
+You can filter papers by specific subcategories within a main category:
+
+```python
+harvester = ArxivOAIHarvester(
+    category="cs:AI",
+    date_from="2024-01-01",
+    date_until="2024-01-31",
+    subcategories=["cs.ai", "cs.cl", "cs.lg"],  # Get papers in AI, CL, and ML
+    verbose=True
+)
+```
 
 ### Custom Session
 
@@ -129,6 +148,7 @@ The harvester respects ArXiv's rate limit of 1 request per 3 seconds. It also im
 - Exponential backoff with jitter for retries
 - Proper handling of HTTP 503 responses
 - Response to `Retry-After` headers
+- Progress reporting with estimated total records
 
 ## Contributing
 
