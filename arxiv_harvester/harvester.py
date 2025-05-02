@@ -4,6 +4,7 @@ from __future__ import annotations
 import random
 import threading
 import time
+import datetime
 import xml.etree.ElementTree as ET
 from typing import Any, Dict, List, Optional
 
@@ -180,6 +181,7 @@ class ArxivOAIHarvester:
         date_from: str,
         date_until: str,
         *,
+        subcategories: Optional[List[str]] = None,
         max_results: Optional[int] = None,
         timeout: int = 300,
         base_delay: float = 1.5,
@@ -193,22 +195,19 @@ class ArxivOAIHarvester:
             category (str): ArXiv category in colon form (e.g., 'cs:AI').
             date_from (str): Start date for harvesting.
             date_until (str): End date for harvesting.
+            subcategories (Optional[List[str]], optional): List of subcategories to harvest. (e.g. ["cs.ai", "cs.cl"]) Defaults to None.
             max_results (Optional[int], optional): Maximum number of results. Defaults to None.
             timeout (int, optional): Operation timeout in seconds. Defaults to 300.
             base_delay (float, optional): Base delay between requests. Defaults to 1.5.
             max_delay (float, optional): Maximum delay between requests. Defaults to 60.
             verbose (bool, optional): Whether to print progress. Defaults to False.
             session (Optional[requests.Session], optional): Custom requests session. Defaults to None.
-
-        Raises:
-            ValueError: If category is not in colon form.
         """
-        if ":" not in category:
-            raise ValueError("Category must be in colon form, e.g. 'cs:AI'")
 
         self.set = category
         self.date_from = date_from
         self.date_until = date_until
+        self.subcategories = [s.lower() for s in subcategories] if subcategories else None
         self.max_results = max_results
         self.timeout = timeout
         self.base_delay = base_delay
@@ -313,6 +312,18 @@ class ArxivOAIHarvester:
             return {}
         return Record(meta).model_dump()
 
+    # ------------------------------------------------------------------ date filter
+    def _created_in_range(self, created_str: str) -> bool:
+        """Return ``True`` if the paper's *creation* date lies within the user-specified window."""
+        try:
+            created = datetime.datetime.strptime(created_str, "%Y-%m-%d").date()
+            start   = datetime.datetime.strptime(self.date_from, "%Y-%m-%d").date()
+            end     = datetime.datetime.strptime(self.date_until, "%Y-%m-%d").date()
+            return start <= created <= end
+        except Exception:
+            # Malformed date? Treat as out‑of‑range so it gets skipped
+            return False
+
     def harvest(self) -> List[Dict[str, Any]]:
         """Download and parse records from ArXiv.
 
@@ -324,17 +335,34 @@ class ArxivOAIHarvester:
         """
         self._records.clear()
 
-        params: Dict[str, str] = dict(
-            verb="ListRecords",
-            metadataPrefix="arXiv",
-            from_=self.date_from,
-            until=self.date_until,
-            set=self.set,
-        )
+        params = {
+            "verb": "ListRecords",
+            "metadataPrefix": "arXiv",
+            "from": self.date_from,
+            "until": self.date_until,
+            "set": self.set,
+        }
 
         while True:
             root = self._request(params)
-
+            if self.verbose and not hasattr(self, "_total_records"):
+                total = None
+                try:
+                    token_elem = root.find(_OAI_NS + "ListRecords").find(_OAI_NS + "resumptionToken")
+                    if token_elem is not None and token_elem.get("completeListSize"):
+                        total = int(token_elem.get("completeListSize"))
+                    else:
+                        total = len(root.findall(_OAI_NS + "ListRecords/" + _OAI_NS + "record"))
+                except Exception:
+                    total = None
+                if total is not None:
+                    if self.max_results:
+                        total = min(total, self.max_results)
+                    self._log(f"Total records available in range: {total}")
+                else:
+                    self._log("Could not determine total record count; proceeding...")
+                self._total_records = total  # remember so we don't print again
+                
             err = root.find(_OAI_NS + "error")
             if err is not None:
                 raise RuntimeError(
@@ -343,6 +371,15 @@ class ArxivOAIHarvester:
 
             for rec in root.findall(_OAI_NS + "ListRecords/" + _OAI_NS + "record"):
                 parsed = self._parse_record(rec)
+                # Skip records that do not match requested sub‑categories
+                if (
+                    self.subcategories
+                    and not any(sub in parsed["categories"].lower() for sub in self.subcategories)
+                ):
+                    continue
+                # Skip records whose *creation* date is outside the requested range
+                if not self._created_in_range(parsed["created"]):
+                    continue
                 if parsed:
                     self._records.append(parsed)
                     if self.max_results and len(self._records) >= self.max_results:
