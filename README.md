@@ -19,13 +19,13 @@ A rate-limit-compliant OAI-PMH harvester for ArXiv papers. This package provides
 You can install arxiv-harvester using pip:
 
 ```bash
-pip install git+[https://github.com/M-Chimiste/arxiv-harvester.git#egg=arxiv-harvester](https://github.com/M-Chimiste/arxiv-harvester.git#egg=arxiv-harvester)
+pip install "git+https://github.com/M-Chimiste/arxiv-harvester.git#egg=arxiv-harvester"
 ```
 
 To include pandas support for DataFrame conversion:
 
 ```bash
-pip install git+[https://github.com/M-Chimiste/arxiv-harvester.git#egg=arxiv-harvester](https://github.com/M-Chimiste/arxiv-harvester.git#egg=arxiv-harvester)[pandas]
+pip install "git+https://github.com/M-Chimiste/arxiv-harvester.git#egg=arxiv-harvester[pandas]"
 ```
 
 ## Quick Start
