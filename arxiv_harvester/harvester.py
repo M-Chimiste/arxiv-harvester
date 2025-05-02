@@ -49,14 +49,14 @@ class Record(BaseModel):
     id: str = Field(description="ArXiv ID of the paper")
     url: str = Field(description="URL to the paper's arXiv abstract")
     pdf_url: str = Field(description="URL to the paper's PDF")
-    title: str
-    abstract: str
-    categories: str = Field(alias="cats")
-    created: str
-    updated: str
-    doi: str
-    authors: List[str]
-    affiliation: List[str]
+    title: str = Field(description="Title of the paper")
+    abstract: str = Field(description="Abstract text of the paper")
+    categories: str = Field(alias="cats", description="Categories the paper falls into.)
+    created: str = Field(description="ArXiv created date of the paper")
+    updated: str = Field(description="ArXiv updated date of the paper")
+    doi: str = Field(description="DOI of the paper")
+    authors: List[str] = Field(description="Paper authors")
+    affiliation: List[str] = Field(description="Author affiliations")
 
     @staticmethod
     def _get_text(xml: ET.Element, tag: str) -> str:
