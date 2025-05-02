@@ -51,7 +51,7 @@ class Record(BaseModel):
     pdf_url: str = Field(description="URL to the paper's PDF")
     title: str = Field(description="Title of the paper")
     abstract: str = Field(description="Abstract text of the paper")
-    categories: str = Field(alias="cats", description="Categories the paper falls into.)
+    categories: str = Field(alias="cats", description="Categories the paper falls into.")
     created: str = Field(description="ArXiv created date of the paper")
     updated: str = Field(description="ArXiv updated date of the paper")
     doi: str = Field(description="DOI of the paper")
