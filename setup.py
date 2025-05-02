@@ -10,7 +10,7 @@ setup(
     description="A rate-limit-compliant OAI-PMH harvester for ArXiv papers",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://github.com/yourusername/arxiv-harvester",
+    url="https://github.com/M-Chimiste/arxiv-harvester",
     packages=find_packages(),
     classifiers=[
         "Development Status :: 3 - Alpha",
