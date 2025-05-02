@@ -192,7 +192,7 @@ class ArxivOAIHarvester:
         """Initialize the ArXiv OAI harvester.
 
         Args:
-            category (str): ArXiv category in colon form (e.g., 'cs:AI').
+            category (str): ArXiv category (e.g., 'cs').
             date_from (str): Start date for harvesting.
             date_until (str): End date for harvesting.
             subcategories (Optional[List[str]], optional): List of subcategories to harvest. (e.g. ["cs.ai", "cs.cl"]) Defaults to None.
