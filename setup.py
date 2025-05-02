@@ -5,7 +5,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setup(
     name="arxiv-harvester",
-    version="0.1.0",
+    version="0.1.1",
     author="arxiv-harvester Contributors",
     description="A rate-limit-compliant OAI-PMH harvester for ArXiv papers",
     long_description=long_description,
